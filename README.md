@@ -1,6 +1,5 @@
 # PDF Chat App
-
-This application utilizes Streamlit, LangChain, and OpenAI to create an interactive chatbot for reading and searching through PDF documents.
+This is a PDF chatbot application powered by LangChain's LLM (Large Language Model). The application allows users to upload a PDF file and engage in a conversation with the chatbot based on the content of the PDF.
 
 ## About
 The PDF Chat App is designed to assist users in extracting information from PDF documents through a chat interface. It leverages advanced AI technologies to analyze and respond to user queries based on the content of the uploaded PDF.
@@ -18,9 +17,10 @@ The PDF Chat App is designed to assist users in extracting information from PDF 
 - **Response Generation**: Generates responses using the GPT-3.5 model tailored to the context of the provided text.
 
 ## Usage
-1. **Upload PDF**: Select a PDF file using the file uploader.
-2. **Chat Interface**: Type your query in the input box and click "Send" to interact with the chatbot.
-3. **View Responses**: The chatbot will provide responses based on the content of the uploaded PDF and the user's query.
+1. **Upload PDF**: Click on the "Upload your PDF" button to upload a PDF file.
+2. **Chat Interface**: Type messages in the chat input box and press Enter to send them to the chatbot.
+3. **AI Response**: The chatbot will respond based on the content of the PDF and the user's queries.
+4. **History**: Chat history is displayed to provide context for the conversation.
 
 ## Installation
 Ensure you have Python installed, then run the following commands to install the required dependencies:
@@ -28,7 +28,7 @@ Ensure you have Python installed, then run the following commands to install the
 pip install streamlit numpy PyPDF2 langchain_text_splitters openai python-dotenv
 ```
 ## Configuration
-Before running the application, make sure to set up your OpenAI API key by creating a .env file and adding your key:
+Before running the application, make sure to set up your OpenAI API key by creating a .streamlit folder and  secrets.toml file and adding your key:
 ```plaintext
 OPENAI_API_KEY=your_api_key_here
 ```
