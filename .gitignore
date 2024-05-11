@@ -1,2 +1,6 @@
-# Ignore el archivo .env
+# Ignore file .env
 .env
+
+# Ignore file .toml
+.toml
+

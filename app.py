@@ -1,18 +1,20 @@
 import streamlit as st
-import os
 import numpy as np
+import time
 from streamlit_extras.add_vertical_space import add_vertical_space
 from PyPDF2 import PdfReader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from openai import OpenAI
-from dotenv import load_dotenv
 from string import Template
 
-# Create OpenAI client
-load_dotenv()
-
-client = OpenAI(api_key = os.getenv('OPENAI_API_KEY'),
+client = OpenAI(api_key = st.secrets["OpenAI_key"],
 )
+
+# Function to stream the data
+def stream_data(response):
+    for word in response.split(" "):
+        yield word + " "
+        time.sleep(0.02)
 
 # Function to generate response from model
 def generate_response(query, sorted_result):
@@ -81,13 +83,15 @@ def extract_text_from_pdf(pdf_file):
     
     return text
 
-#Function to display queries
-def get_query_responses(queries_and_responses):
-    # Show all queries
-    st.subheader("Responses:")
-    for query, response in queries_and_responses:
-        st.write("You:", query)
-        st.write("ChatGPT:", response)
+# Function to display chat history
+def display_chat_history():
+    #Initialize chat history
+    if "messages" not in st.session_state:
+        st.session_state.messages = []
+    #Display messages from history on app run
+    for message in st.session_state.messages:
+        with st.chat_message(message["role"]):
+            st.write(message["content"])
 
 # Function to display a sidebar
 def display_sidebar():
@@ -111,38 +115,43 @@ def main():
     pdf = st.file_uploader("Upload your PDF", type='pdf')
 
     if pdf is not None:
+        display_chat_history()
         pdf_text = extract_text_from_pdf(pdf)
         chunks = split_text_into_chunks(pdf_text)
         
-        query = st.text_input("You:", "")
+        if query:= st.chat_input("Say something:"):
 
-        if st.button("Send"):
-            st.text("ChatGPT is typing...")
+            with st.chat_message("human"):
+                st.write(stream_data(query))
+                st.session_state.messages.append({"role": "user", "content": query})
+            
+            with st.chat_message("ai"):
+                st.write(stream_data("Hello 👋"))
+                st.write(stream_data("typing..."))
 
-            # Let's calculate the embedding vectors of all chunk docs.
-            # Here we simply store them in an array in memory.
-            embeddings = []
-            for chunk_text in chunks:
-                embeddings.append((chunk_text, get_embedding_vec(chunk_text)))
-            
-            query_embedding = get_embedding_vec(query)
-            
-            sorted_result = []
-            # Iterate over all chunk text and calculate the similarity (dot product) of
-            # the paragraphs description and the query text.
-            for chunk_text, embedding in embeddings:
-                similarity = np.dot(embedding, query_embedding)
-                sorted_result.append((chunk_text, embedding, similarity ))
-            
-            # We sort the result descending based on the similarity so that the top
-            # elements are probably more relevant than the last ones.
-            sorted_result = sorted(sorted_result, key=lambda x: x[2], reverse=True)
-            
-            # Generate response
-            response = generate_response(query, sorted_result)
-            queries_and_responses = []  # List of all queries
-            queries_and_responses.append((query, response))      
-            get_query_responses(queries_and_responses)
-          
+                # Let's calculate the embedding vectors of all chunk docs.
+                # Here we simply store them in an array in memory.
+                embeddings = []
+                for chunk_text in chunks:
+                    embeddings.append((chunk_text, get_embedding_vec(chunk_text)))
+                
+                query_embedding = get_embedding_vec(query)
+                
+                sorted_result = []
+                # Iterate over all chunk text and calculate the similarity (dot product) of
+                # the paragraphs description and the query text.
+                for chunk_text, embedding in embeddings:
+                    similarity = np.dot(embedding, query_embedding)
+                    sorted_result.append((chunk_text, embedding, similarity ))
+                
+                # We sort the result descending based on the similarity so that the top
+                # elements are probably more relevant than the last ones.
+                sorted_result = sorted(sorted_result, key=lambda x: x[2], reverse=True)
+                
+                # Generate response
+                response = generate_response(query, sorted_result)
+                st.write_stream(stream_data(response))
+                st.session_state.messages.append({"role": "ai", "content": response})
+           
 if __name__ == '__main__':
     main()
