@@ -1,6 +1,1 @@
-# Ignore file .env
-.env
-
-# Ignore file .toml
-.toml
-
+.streamlit
