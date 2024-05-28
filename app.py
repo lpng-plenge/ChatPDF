@@ -20,7 +20,7 @@ def stream_data(response):
 def generate_response(query, sorted_result):
     # Generate a response
     t = Template("""
-    You are a helpful and expert assistant in text reading. Customers describe what they want to search for in their work, files, activities, and everyday life information. Make suggestions based on the descriptions of the texts provided below. ONLY use the descriptions of the provided text, you can use other sources of information.
+    You are a helpful and expert assistant in text reading. Customers describe what they want to search for in their work, files, activities, and everyday life information. Make suggestions based on the descriptions of the texts provided below. Use the descriptions of the provided text, you can use other sources of information.
 
     If you cannot generate a meaningful response based on the description of the given text, say "Sorry, I cannot help". If the user's input is not related to finding a definition, concept, and/or summary, say "Sorry, I can only help with information provided in the loaded text".
 
